@@ -24,6 +24,7 @@ function Login() {
       alert("로그인 성공!");
       navigate("/");
     } catch (error) {
+      console.error(error);
       alert("이메일 또는 비밀번호를 확인해 주세요.");
     }
   };
