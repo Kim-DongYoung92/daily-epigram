@@ -1,90 +1,63 @@
-// src/App.jsx
+import { Routes, Route, Link } from 'react-router-dom';
+
 function App() {
   return (
     <div>
-      {/* 1. 상단 네비게이션 */}
+      {/* 요구사항: 상단 네비게이션 바 */}
       <nav>
-        <strong>Epigram</strong>
-        <span> | 피드</span>
-        <span style={{ float: 'right' }}>로그인</span>
+        {/* 로고 클릭 시 "/" 이동 */}
+        <Link to="/" style={{ fontSize: '20px', fontWeight: 'bold', textDecoration: 'none', color: 'black' }}>
+          Epigram (로고)
+        </Link>
+
+        {/* 피드 클릭 시 피드 페이지 이동 */}
+        <Link to="/feed" style={{ marginLeft: '20px' }}>피드</Link>
+
+        <button style={{ float: 'right' }}>로그인</button>
       </nav>
 
       <hr />
 
-      {/* 2. 메인 랜딩 섹션 (시안 첫 번째 부분) */}
+      {/* 페이지 경로 설정 */}
+      <Routes>
+        {/* 랜딩 페이지 ("/") */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* 피드 페이지 ("/feed") */}
+        <Route path="/feed" element={<div><h2>피드 페이지입니다.</h2><p>여기에 에피그램 목록이 나올 예정입니다.</p></div>} />
+      </Routes>
+    </div>
+  );
+}
+
+// 랜딩 페이지 컴포넌트 (시안 내용 포함)
+function LandingPage() {
+  return (
+    <main>
       <section>
         <h1>나만 갖고 있기엔 아까운 글이 있지 않나요?</h1>
         <p>다른 사람들과 감성을 공유해 보세요.</p>
-
-        <div>
-          <h3>명언이나 글귀, 토막 상식들을 공유해 보세요.</h3>
-          <p>나만 알던 소중한 글들을 다른 사람들에게 전파하세요.</p>
-        </div>
+        <h3>명언이나 글귀, 토막 상식들을 공유해 보세요.</h3>
       </section>
 
-      <hr />
-
-      {/* 3. 에피그램 리스트 섹션 (시안 두 번째 부분) */}
       <section>
         <h2>사용자들이 직접 인용한 에피그램들</h2>
         <ul>
-          <li>
-            <p>오랫동안 꿈을 그리는 사람은 마침내 그 꿈을 닮아 간다.</p>
-            <span>- 앙드레 말로 -</span>
-            <p>#나아가야할때 #꿈을이루고싶을때</p>
-          </li>
-          <li>
-            <p>이 세상에는 위대한 진실이 하나 있어. 무언가를 온 마음을 다해 원한다면, 반드시 그렇게 된다는 거야...</p>
-            <span>- 파울로 코엘료 -</span>
-            <p>#나아가야할때 #꿈을이루고싶을때</p>
-          </li>
-          <li>
-            <p>오랫동안 꿈을 그리는 사람은 마침내 그 꿈을 닮아 간다.</p>
-            <span>- 앙드레 말로 -</span>
-          </li>
+          <li>"오랫동안 꿈을 그리는 사람은..." - 앙드레 말로</li>
+          <li>"이 세상에는 위대한 진실이 하나 있어..." - 파울로 코엘료</li>
         </ul>
-        <button>...</button> {/* 더보기 버튼 의미 */}
       </section>
 
-      <hr />
-
-      {/* 4. 감정 맞춤 섹션 (시안 세 번째 부분 상단) */}
       <section>
         <h3>감정 상태에 따라, 알맞은 위로를 받을 수 있어요.</h3>
-        <p>태그를 통해 글을 모아 볼 수 있어요.</p>
-        <div>
-          {/* 시안의 아이콘들을 텍스트로 표현 */}
-          <span>[기쁨]</span> <span>[고민]</span> <strong>[슬픔]</strong> <span>[분노]</span>
-        </div>
-        <p>#우울해요 #마음이착잡할때 #슬플때에필로그 #위로가필요해</p>
+        <div>😊 기쁨 | 😟 고민 | 😢 슬픔 | 😡 분노</div>
       </section>
 
-      <hr />
-
-      {/* 5. 감정 통계 섹션 (시안 세 번째 부분 하단) */}
       <section>
-        <div>
-          <span>😊 기쁨</span>
-          <h3>내가 요즘 어떤 감정 상태인지 통계로 한눈에 볼 수 있어요.</h3>
-          <p>감정 달력으로 내 마음에 담긴 감정을 확인해보세요.</p>
-        </div>
-
-        {/* 통계 수치 나열 */}
-        <ul>
-          <li>🟩 기쁨 35%</li>
-          <li>🟧 고민 20%</li>
-          <li>🟨 행복 19%</li>
-          <li>🟦 슬픔 17%</li>
-          <li>🟥 분노 9%</li>
-        </ul>
+        <h3>내가 요즘 어떤 감정 상태인지 통계로 한눈에 볼 수 있어요.</h3>
+        <p>기쁨 35% | 고민 20% | 슬픔 17%</p>
       </section>
-
-      <hr />
-
-      <footer>
-        <h2>날마다 에피그램</h2>
-      </footer>
-    </div>
+    </main>
   );
 }
 
