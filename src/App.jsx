@@ -1,4 +1,4 @@
-
+import React from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import LandingPage from './LandingPage';
 import Login from './Login';
@@ -15,16 +15,15 @@ function App() {
         <Link to="/login" style={{ marginRight: '10px' }}>로그인</Link>
         <Link to="/signup" style={{ marginRight: '10px' }}>회원가입</Link>
         <Link to="/epigramlist" style={{ marginRight: '10px' }}>피드</Link>
-        <Link to="/create">만들기</Link>
+        <Link to="/addepigram">만들기</Link>
       </nav>
-
 
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/epigramlist" element={<EpigramList />} />
-        <Route path="/create" element={<AddEpigram />} />
+        <Route path="/addepigram" element={<AddEpigram />} />
         <Route path="/epigrams/:id" element={<EpigramDetail />} />
       </Routes>
     </div>

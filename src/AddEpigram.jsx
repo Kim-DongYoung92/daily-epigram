@@ -1,78 +1,103 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const AddEpigram = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // 상태 관리: 내용, 저자 타입, 저자 이름, 출처 제목, 출처 URL, 태그
-  const [content, setContent] = useState('');
-  const [authorType, setAuthorType] = useState('직접 입력');
-  const [authorName, setAuthorName] = useState('');
-  const [sourceTitle, setSourceTitle] = useState('');
-  const [sourceUrl, setSourceUrl] = useState('');
-  const [tagInput, setTagInput] = useState(''); // 태그 입력창 상태
-  const [tags, setTags] = useState([]); // 추가된 태그 배열
+  // 1. 상세 페이지에서 넘겨준 수정용 데이터 받기
+  const editData = location.state?.editData;
 
-  // 유효성 검사 변수
+  // 2. 상태 초기화 (데이터가 없을 경우를 대비해 빈 값 처리 및 데이터 타입 보정)
+  const [content, setContent] = useState(editData ? editData.content : '');
+
+  // 저자 타입 판단 로직
+  const getInitialAuthorType = () => {
+    if (!editData) return '직접 입력';
+    if (['알 수 없음', '본인'].includes(editData.author)) return editData.author;
+    return '직접 입력';
+  };
+  const [authorType, setAuthorType] = useState(getInitialAuthorType());
+
+  const [authorName, setAuthorName] = useState(
+    editData && !['알 수 없음', '본인'].includes(editData.author) ? editData.author : ''
+  );
+
+  const [sourceTitle, setSourceTitle] = useState(editData ? editData.sourceTitle : '');
+  const [sourceUrl, setSourceUrl] = useState(editData ? editData.sourceUrl : '');
+  const [tagInput, setTagInput] = useState('');
+
+  // [핵심] tags가 배열이 아닐 경우를 대비해 안전하게 초기화
+  const [tags, setTags] = useState(() => {
+    if (!editData || !editData.tags) return [];
+    return Array.isArray(editData.tags) ? editData.tags : [];
+  });
+
   const isContentTooLong = content.length > 500;
   const isFormValid = content.length > 0 && !isContentTooLong && (authorType !== '직접 입력' || authorName.trim() !== '');
 
-  // 태그 추가 로직 (엔터 키 입력 시)
   const handleTagKeyDown = (e) => {
     if (e.key === 'Enter' && tagInput.trim() !== '') {
       e.preventDefault();
-      if (tags.length >= 3) {
-        alert("태그는 최대 3개까지만 가능합니다.");
-        return;
-      }
-      if (tagInput.length > 10) {
-        alert("태그는 최대 10자까지 입력 가능합니다.");
-        return;
-      }
+      if (tags.length >= 3) return alert("태그는 최대 3개까지만 가능합니다.");
+      if (tagInput.length > 10) return alert("태그는 최대 10자까지 입력 가능합니다.");
       setTags([...tags, tagInput.trim()]);
       setTagInput('');
     }
   };
 
-  // 태그 삭제 로직
   const removeTag = (indexToRemove) => {
     setTags(tags.filter((_, index) => index !== indexToRemove));
   };
 
-  // 작성완료 버튼 클릭
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!isFormValid) return;
 
-    // 1. 입력한 데이터들을 하나로 묶기
-    const newEpigram = {
-      id: Date.now(),
-      content,
-      author: authorType === '직접 입력' ? authorName : authorType,
-      sourceTitle,
-      sourceUrl,
-      tags,
-      createdAt: new Date().toISOString(),
-    };
-
-    // 2. 브라우저 저장소(localStorage)에 저장하는 핵심 로직
     const existingEpigrams = JSON.parse(localStorage.getItem('epigrams') || '[]');
-    const updatedEpigrams = [newEpigram, ...existingEpigrams];
-    localStorage.setItem('epigrams', JSON.stringify(updatedEpigrams));
 
-    alert("에피그램이 등록되었습니다!");
-
-    // 3. 등록 후 피드(리스트) 페이지로 이동
+    if (editData) {
+      // 수정 모드
+      const updatedEpigrams = existingEpigrams.map(item =>
+        item.id === editData.id
+          ? {
+            ...item,
+            content,
+            author: authorType === '직접 입력' ? authorName : authorType,
+            sourceTitle,
+            sourceUrl,
+            tags
+          }
+          : item
+      );
+      localStorage.setItem('epigrams', JSON.stringify(updatedEpigrams));
+      alert("에피그램이 수정되었습니다!");
+    } else {
+      // 신규 등록 모드
+      const newEpigram = {
+        id: Date.now(),
+        content,
+        author: authorType === '직접 입력' ? authorName : authorType,
+        sourceTitle,
+        sourceUrl,
+        tags,
+        userId: "me",
+        createdAt: new Date().toISOString(),
+      };
+      localStorage.setItem('epigrams', JSON.stringify([newEpigram, ...existingEpigrams]));
+      alert("에피그램이 등록되었습니다!");
+    }
     navigate('/epigramlist');
   };
 
   return (
     <div style={{ maxWidth: '600px', margin: '40px auto', padding: '20px', fontFamily: 'sans-serif' }}>
-      <h2 style={{ fontSize: '20px', marginBottom: '24px' }}>에피그램 만들기</h2>
+      <h2 style={{ fontSize: '20px', marginBottom: '24px' }}>
+        {editData ? "에피그램 수정하기" : "에피그램 만들기"}
+      </h2>
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-        {/* 내용 입력 영역 */}
+        {/* 내용 입력 */}
         <div>
           <label style={{ display: 'block', marginBottom: '8px' }}>내용 <span style={{ color: 'red' }}>*</span></label>
           <textarea
@@ -87,7 +112,7 @@ const AddEpigram = () => {
           </div>
         </div>
 
-        {/* 저자 선택 영역 */}
+        {/* 저자 선택 */}
         <div>
           <label style={{ display: 'block', marginBottom: '8px' }}>저자 <span style={{ color: 'red' }}>*</span></label>
           <div style={{ display: 'flex', gap: '15px', marginBottom: '10px' }}>
@@ -114,7 +139,7 @@ const AddEpigram = () => {
           )}
         </div>
 
-        {/* 출처 입력 영역 */}
+        {/* 출처 */}
         <div>
           <label style={{ display: 'block', marginBottom: '8px' }}>출처</label>
           <input
@@ -133,7 +158,7 @@ const AddEpigram = () => {
           />
         </div>
 
-        {/* 태그 입력 영역 */}
+        {/* 태그 */}
         <div>
           <label style={{ display: 'block', marginBottom: '8px' }}>태그</label>
           <input
@@ -153,7 +178,6 @@ const AddEpigram = () => {
           </div>
         </div>
 
-        {/* 작성 완료 버튼 */}
         <button
           type="submit"
           disabled={!isFormValid}
@@ -168,7 +192,7 @@ const AddEpigram = () => {
             cursor: isFormValid ? 'pointer' : 'not-allowed'
           }}
         >
-          작성 완료
+          {editData ? "수정 완료" : "작성 완료"}
         </button>
       </form>
     </div>
