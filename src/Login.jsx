@@ -10,31 +10,27 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await axios.post(`${BASE_URL}/login`, {
-        email: email,
-        password: password,
-      });
+      const res = await axios.post(`${BASE_URL}/auth/login`, { email, password });
 
-      // 서버에서 준 토큰 저장
-      const token = response.data.accessToken;
-      localStorage.setItem('accessToken', token);
+
+      localStorage.setItem('accessToken', res.data.accessToken);
+      localStorage.setItem('currentUser', JSON.stringify(res.data.user));
 
       alert("로그인 성공!");
-      navigate("/");
+      navigate('/epigramlist');
     } catch (error) {
-      console.error(error);
-      alert("이메일 또는 비밀번호를 확인해 주세요.");
+      console.log(error)
+      alert("로그인 정보가 올바르지 않습니다.");
     }
   };
 
   return (
-    <div>
+    <div style={{ padding: '20px' }}>
       <h2>로그인</h2>
       <form onSubmit={handleLogin}>
-        <input type="email" placeholder="이메일" value={email} onChange={(e) => setEmail(e.target.value)} /><br />
-        <input type="password" placeholder="비밀번호" value={password} onChange={(e) => setPassword(e.target.value)} /><br />
+        <input placeholder="이메일" value={email} onChange={e => setEmail(e.target.value)} /><br />
+        <input type="password" placeholder="비밀번호" value={password} onChange={e => setPassword(e.target.value)} /><br />
         <button type="submit">로그인</button>
       </form>
     </div>

@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 const EpigramDetail = () => {
-  const { id } = useParams(); // URL에 있는 ID 숫자 값을 가져옵니다.
+  const { id } = useParams();
 
-  // 창고(localStorage)에서 이 ID에 맞는 데이터만 딱 하나 찾아옵니다.
+
   const [epigram] = useState(() => {
     const saved = JSON.parse(localStorage.getItem('epigrams') || '[]');
     return saved.find(item => item.id === Number(id));
   });
 
-  // 만약 글을 못 찾았다면 안내 메시지를 보여줍니다.
+
   if (!epigram) return <div style={{ padding: '20px' }}>글을 찾을 수 없습니다.</div>;
 
   return (
