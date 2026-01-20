@@ -1,60 +1,35 @@
-// src/EpigramList.jsx
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { BASE_URL } from './constants';
+import React, { useState } from 'react';
 
-function EpigramList() {
-  const navigate = useNavigate();
-  const [epigrams, setEpigrams] = useState([]); // 에피그램 목록 저장용
-
-  // 1. 페이지가 로드될 때 서버에서 데이터 가져오기 (요구사항: 화면과 같이 노출)
-  useEffect(() => {
-    const getEpigrams = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/epigrams`);
-        // 서버 응답 구조가 { list: [...] } 형태라고 가정합니다.
-        setEpigrams(response.data.list || []);
-      } catch (error) {
-        console.error("데이터 로딩 실패:", error);
-      }
-    };
-    getEpigrams();
-  }, []);
+const EpigramList = () => {
+  const [epigrams] = useState(() => {
+    const saved = localStorage.getItem('epigrams');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   return (
-    <div>
-      <header>
-        <h2>사용자들이 직접 인용한 에피그램들</h2>
-      </header>
+    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
+      <h2 style={{ marginBottom: '20px', borderBottom: '2px solid #333', paddingBottom: '10px' }}>
+        에피그램 피드
+      </h2>
 
-      {/* 2. 에피그램 리스트 (카드 형태 구조) */}
-      <main style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', padding: '20px' }}>
-        {epigrams.map((item) => (
-          <div key={item.id} style={{ border: '1px solid #eee', padding: '20px', borderRadius: '10px' }}>
-            <p>{item.content}</p>
-            <p style={{ textAlign: 'right' }}>- {item.author} -</p>
-            <small style={{ color: 'blue' }}>#태그 #예시</small>
+      {epigrams.length === 0 ? (
+        <p style={{ textAlign: 'center', color: '#888' }}>등록된 글이 없습니다.</p>
+      ) : (
+        epigrams.map((item) => (
+          <div key={item.id} style={{
+            border: '1px solid #eee',
+            padding: '20px',
+            marginBottom: '15px',
+            borderRadius: '12px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+          }}>
+            <p style={{ fontSize: '18px', marginBottom: '10px' }}>"{item.content}"</p>
+            <p style={{ textAlign: 'right', fontWeight: 'bold', color: '#555' }}>- {item.author}</p>
           </div>
-        ))}
-      </main>
-
-      {/* 3. 에피그램 더보기 버튼 (요구사항 반영) */}
-      <div style={{ textAlign: 'center', margin: '20px' }}>
-        <button onClick={() => alert('다음 페이지 데이터를 가져옵니다.')}>
-          + 에피그램 더보기
-        </button>
-      </div>
-
-      {/* 4. 에피그램 만들기 버튼 (요구사항: 작성 페이지 이동) */}
-      <button
-        onClick={() => navigate('/create')}
-        style={{ position: 'fixed', bottom: '30px', right: '30px', padding: '15px', borderRadius: '50px' }}
-      >
-        + 에피그램 만들기
-      </button>
+        ))
+      )}
     </div>
   );
-}
+};
 
 export default EpigramList;
