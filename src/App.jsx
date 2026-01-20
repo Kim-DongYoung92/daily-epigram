@@ -5,6 +5,7 @@ import Login from './Login';
 import Signup from './Signup';
 import EpigramList from './EpigramList';
 import AddEpigram from './AddEpigram';
+import EpigramDetail from './EpigramDetail';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/epigramlist" element={<EpigramList />} />
         <Route path="/create" element={<AddEpigram />} />
+        <Route path="/epigrams/:id" element={<EpigramDetail />} />
       </Routes>
     </div>
   );
